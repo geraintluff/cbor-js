@@ -27,7 +27,8 @@ var POW_2_24 = 5.960464477539063e-8,
     POW_2_32 = 4294967296,
     POW_2_53 = 9007199254740992;
 
-function encode(value) {
+// tagger returns falsey, or {tag: N, value: V}
+function encode(value, tagger) {
   var data = new ArrayBuffer(256);
   var dataView = new DataView(data);
   var lastLength;
@@ -98,6 +99,13 @@ function encode(value) {
   }
 
   function encodeItem(value) {
+    if (tagger) {
+      let taggedValue = tagger(value);
+      if (taggedValue) {
+        writeTypeAndLength(6, taggedValue.tag);
+        value = taggedValue.value;
+      }
+    }
     var i;
 
     if (value === false)
