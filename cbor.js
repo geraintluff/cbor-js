@@ -197,8 +197,18 @@ function encode(value, tagger) {
 }
 
 function decode(data, tagger, simpleValue) {
-  var dataView = new DataView(data);
-  var offset = 0;
+  var dataView, offset, endOffset;
+  if (data instanceof ArrayBuffer) {
+    dataView = new DataView(data);
+    offset = 0;
+    endOffset = data.byteLength;
+  } else if (data instanceof Uint8Array || data instanceof Int8Array) {
+    dataView = new DataView(data.buffer);
+    offset = data.byteOffset;
+    endOffset = offset + data.length;
+  } else {
+    throw "Invalid input type"
+  }
 
   if (typeof tagger !== "function")
     tagger = function(value) { return value; };
@@ -402,7 +412,7 @@ function decode(data, tagger, simpleValue) {
   }
 
   var ret = decodeItem();
-  if (offset !== data.byteLength)
+  if (offset !== endOffset)
     throw "Remaining bytes";
   return ret;
 }
