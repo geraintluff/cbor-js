@@ -167,6 +167,10 @@ function encode(value, tagger) {
         } else if (value instanceof Uint8Array) {
           writeTypeAndLength(2, value.length);
           writeUint8Array(value);
+        } else if (value instanceof ArrayBuffer) {
+          value = new Uint8Array(value);
+          writeTypeAndLength(2, value.length);
+          writeUint8Array(value);
         } else {
           var keys = Object.keys(value);
           length = keys.length;
